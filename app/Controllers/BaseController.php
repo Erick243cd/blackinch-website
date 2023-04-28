@@ -2,11 +2,19 @@
 
 namespace App\Controllers;
 
+use App\Models\CarouselModel;
+use App\Models\CategoryModel;
+use App\Models\CoordonneeModel;
+use App\Models\PodcastModel;
+use App\Models\ServiceModel;
+use App\Models\RoleModel;
+use App\Models\UserModel;
 use CodeIgniter\Controller;
 use CodeIgniter\HTTP\CLIRequest;
 use CodeIgniter\HTTP\IncomingRequest;
 use CodeIgniter\HTTP\RequestInterface;
 use CodeIgniter\HTTP\ResponseInterface;
+use Config\Services;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -54,5 +62,17 @@ abstract class BaseController extends Controller
         // Preload any models, libraries, etc, here.
 
         // E.g.: $this->session = \Config\Services::session();
+        $this->serviceModel = new ServiceModel();
+        $this->podcastModel = new PodcastModel();
+        $this->categoryModel = new CategoryModel();
+        $this->coordonneeModel = new CoordonneeModel();
+        $this->roleModel = new RoleModel();
+        $this->userModel = new UserModel();
+        $this->carouselModel = new CarouselModel();
+
+        // Preload any models, libraries, etc, here.
+        helper(['text', 'form', 'url', 'custom']);
+        $this->session = Services::session();
+        $this->validation = Services::validation();
     }
 }
