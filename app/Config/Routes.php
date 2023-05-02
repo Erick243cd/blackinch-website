@@ -65,23 +65,23 @@ $routes->group('', ['filter' => 'AuthCheck'], function ($routes) {
     $routes->get('/add-member', 'Team::create');
     $routes->get('/change-pwd', 'Auth::change');
 
-    $routes->get('add-post', 'Services::create');
-    $routes->post('add-post', 'Services::create');
+    $routes->get('add-post', 'Posts::create');
+    $routes->post('add-post', 'Posts::create');
 
-    $routes->get('post-edit/(:any)', 'Services::edit/$1');
-    $routes->post('edit-post/(:any)', 'Services::edit/$1');
+    $routes->get('post-edit/(:any)', 'Posts::edit/$1');
+    $routes->post('edit-post/(:any)', 'Posts::edit/$1');
 
-    $routes->get('remove-as-featured/(:any)', 'Services::removeAsFeatured/$1');
-    $routes->get('make-as-featured/(:any)', 'Services::makeAsFeatured/$1');
+    $routes->get('remove-as-featured/(:any)', 'Posts::removeAsFeatured/$1');
+    $routes->get('make-as-featured/(:any)', 'Posts::makeAsFeatured/$1');
 
-    $routes->get('remove-as-most-format/(:any)', 'Services::removeAsMostFormat/$1');
-    $routes->get('make-as-most-format/(:any)', 'Services::makeAsMostFormat/$1');
+    $routes->get('remove-as-most-format/(:any)', 'Posts::removeAsMostFormat/$1');
+    $routes->get('make-as-most-format/(:any)', 'Posts::makeAsMostFormat/$1');
 
-    $routes->get('delete-post/(:any)', 'Services::delete/$1');
-    $routes->get('list-posts', 'Services::index');
-    $routes->get('post-image/(:any)', 'Services::addImage/$1');
-    $routes->post('post-image/(:any)', 'Services::addImage/$1');
-    $routes->post('save-post-picture', 'Services::saveImage');
+    $routes->get('delete-post/(:any)', 'Posts::delete/$1');
+    $routes->get('list-posts', 'Posts::index');
+    $routes->get('post-image/(:any)', 'Posts::addImage/$1');
+    $routes->post('post-image/(:any)', 'Posts::addImage/$1');
+    $routes->post('save-post-picture', 'Posts::saveImage');
 
 
     $routes->get('list-podcasts', 'Podcasts::list');

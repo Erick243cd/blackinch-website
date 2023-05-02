@@ -33,49 +33,49 @@
                         <div class="card-body">
 
                             <?= form_open_multipart('add-post') ?>
-                            <?= csrf_field() ?>
-                            <div class="row">
-                                <div class="col-sm-12">
-                                    <div class="form-group">
-                                        <label class="floating-label" for="name">Titre</label>
-                                        <input type="text" class="form-control" name="title"
-                                               value="<?= set_value('title') ?>">
+                                <?= csrf_field() ?>
+                                <div class="row">
+                                    <div class="col-sm-12">
+                                        <div class="form-group">
+                                            <label class="floating-label" for="name">Titre</label>
+                                            <input type="text" class="form-control" name="title"
+                                                value="<?= set_value('title') ?>">
+                                            <small id="input-help"
+                                                class="form-text text-danger"><?= $validation['title'] ?? null; ?></small>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-12">
+                                        <div class="form-group">
+                                            <label class="floating-label" for="">Catégorie du post</label>
+                                            <select name="category_id" class="form-control">
+                                                <?php foreach ($categories as $row): ?>
+                                                    <option value="<?= $row->categoryId ?>" <?= set_select('category_id', $row->categoryId); ?>><?= ucfirst($row->name) ?></option>
+                                                <?php endforeach; ?>
+                                            </select>
+                                            <small id="input-help"
+                                                class="form-text text-danger"><?= $validation['category_id'] ?? null; ?></small>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-12">
+                                        <div class="form-group">
+                                            <label class="floating-label" for="description">Description</label>
+                                            <textarea class="form-control" name="description" id="" cols="30"
+                                                    rows="3"><?= set_value('description') ?></textarea>
+                                            <small id="input-help"
+                                                class="form-text text-danger"><?= $validation['description'] ?? null; ?></small>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-12">
+                                        <div class="form-group">
+                                            <input type="file" class="form-control" name="picture" accept="image/*">
+                                        </div>
                                         <small id="input-help"
-                                               class="form-text text-danger"><?= $validation['title'] ?? null; ?></small>
+                                            class="form-text text-danger"><?= $validation['picture'] ?? null; ?></small>
+                                    </div>
+                                    <div class="col-sm-12 text-center">
+                                        <input type="submit" class="btn btn-md btn-primary" value="Enregistrer et publier">
                                     </div>
                                 </div>
-                                <div class="col-sm-12">
-                                    <div class="form-group">
-                                        <label class="floating-label" for="">Catégorie du post</label>
-                                        <select name="category_id" class="form-control">
-                                            <?php foreach ($categories as $row): ?>
-                                                <option value="<?= $row->categoryId ?>" <?= set_select('category_id', $row->categoryId); ?>><?= ucfirst($row->name) ?></option>
-                                            <?php endforeach; ?>
-                                        </select>
-                                        <small id="input-help"
-                                               class="form-text text-danger"><?= $validation['category_id'] ?? null; ?></small>
-                                    </div>
-                                </div>
-                                <div class="col-sm-12">
-                                    <div class="form-group">
-                                        <label class="floating-label" for="description">Description</label>
-                                        <textarea class="form-control" name="description" id="" cols="30"
-                                                  rows="3"><?= set_value('description') ?></textarea>
-                                        <small id="input-help"
-                                               class="form-text text-danger"><?= $validation['description'] ?? null; ?></small>
-                                    </div>
-                                </div>
-                                <div class="col-sm-12">
-                                    <div class="form-group">
-                                        <input type="file" class="form-control" name="picture">
-                                    </div>
-                                    <small id="input-help"
-                                           class="form-text text-danger"><?= $validation['picture'] ?? null; ?></small>
-                                </div>
-                                <div class="col-sm-12 text-center">
-                                    <input type="submit" class="btn btn-md btn-primary" value="Enregistrer et publier">
-                                </div>
-                            </div>
                             </form>
 
                         </div>

@@ -45,7 +45,7 @@
                         <div class="row text-c">
                             <div class="col-sm-6">
                                 <div class="form-group">
-                                    <input type="file" class="form-control" name="picture">
+                                    <input type="file" class="form-control" name="picture" accept="image/*">
                                 </div>
                                 <small id="input-help"
                                        class="form-text text-danger"><?= $validation['picture'] ?? null; ?></small>

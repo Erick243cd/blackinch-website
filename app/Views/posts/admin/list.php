@@ -54,7 +54,7 @@
                                     <?php foreach ($posts as $row) : ?>
                                         <tr>
                                             <td class="align-middle">
-                                                <img src="<?= site_url() ?>public/assets/img/posts/<?= $row->postImage ?>"
+                                                <img src="<?= site_url() ?>public/assets/es_admin/images/posts/<?= $row->postImage ?>"
                                                      alt="sect-img"
                                                      title="project-img"
                                                      class="rounded mr-3"

@@ -8,12 +8,15 @@ class Posts extends BaseController
 {
 
     public function index()
-    {
+    {      
         $data = [
             'user_data' => session()->get('user_data'),
             'title' => altData(),
-            'posts' => $this->postModel->asObject()->where('is_deleted', 'N')->findAll()
+            'posts' => $this->postModel->asObject()
+                ->join('categories', 'categories.categoryId=posts.category_id')
+                ->where('is_deleted', '0')->findAll()
         ];
+        return view('posts/admin/list', $data);
         return view('posts/admin/list', $data);
     }
 
@@ -21,12 +24,14 @@ class Posts extends BaseController
     {
         $data = [
             'page' => 'activities',
-            'title' => 'Activités récentes | ' . altData(),
-            'contacts' => $this->coordModel->asObject()->first(),
             'user_data' => session()->get('user_data'),
-            'posts' => $this->postModel->asObject()->where('is_deleted', 'N')->orderBy('postId', 'DESC')->findAll()
+            'title' => 'Activités récentes | ' . altData(),
+            'contacts' => $this->coordonneeModel->asObject()->first(),
+            'posts' => $this->postModel->asObject()
+                ->join('categories', 'categories.categoryId=posts.category_id')
+                ->where('is_deleted', '0')->findAll()
         ];
-        return view('posts/index', $data);
+        return view('posts/admin/list', $data);
     }
 
 
@@ -36,27 +41,12 @@ class Posts extends BaseController
         $data = [
             'title' => "Nouvelle Activité",
             'validation' => null,
+            'categories' => $this->categoryModel->asObject()->findAll()
         ];
+        // Get Validation rules from the model
+        $rules = $this->postModel->getValidationRules();
         if ($this->request->getMethod() == 'post') {
-            $this->validation->setRules([
-                'title' => [
-                    'label' => 'Projet', 'rules' => 'required',
-                    'errors' => ['required' => 'Le titre est réquis'],
-                ],
-                'description' => [
-                    'label' => 'Description', 'rules' => 'required',
-                    'errors' => ['required' => 'La description est requise'],
-                ],
-                'picture' => [
-                    'label' => 'Picture',
-                    'rules' => 'uploaded[picture]|is_image[picture]|max_size[picture,5096]',
-                    'errors' => [
-                        'uploaded' => 'Ne doit pas être vide',
-                        'is_image' => 'Le format de cet image est inconnu',
-                        'max_size' => 'Ne doit pas dépasser 5 Mo de taille',
-                    ]
-                ]
-            ]);
+            $this->validation->setRules($rules);
             if ($this->validation->withRequest($this->request)->run()) {
 
                 $file = $this->request->getFile('picture');
@@ -68,19 +58,18 @@ class Posts extends BaseController
                         'title' => $this->request->getVar('title'),
                         'slug' => strtolower(convert_accented_characters(url_title($this->request->getVar('title')))),
                         'description' => $this->request->getVar('description'),
-                        'picture' => $imageName,
+                        'category_id' => $this->request->getVar('category_id'),
+                        'postImage' => $imageName,
                         'created_at' => date('Y-m-d'),
                         'updated_at' => date('Y-m-d'),
                     );
-
                     $this->postModel->save($data);
 
                     $file->move('./public/assets/es_admin/images/posts', $imageName);
-
-                    session()->setFlashData("success", "Ajouté avec succès");
-                    return redirect()->to('/list-posts');
+                    return redirect()->to('/list-posts')->with("success", "Ajouté avec succès");
                 }
             } else {
+                // die('Fuck yourself');
                 $data['validation'] = $this->validation->getErrors();
             }
         }
@@ -89,52 +78,48 @@ class Posts extends BaseController
 
     public function edit($id)
     {
-        $post = $this->postModel->asObject()->where('postId', $id)->first();
-        if (!empty($post)) {
+        $post = $this->postModel->asObject()
+            ->join('categories', 'categories.categoryId=posts.category_id')
+            ->where('postId', $id)->first();
 
+        if (!empty($post)) {
             $data = [
-                'title' => "Modifier l'activité",
+                'title' => "Modifier le post",
                 'validation' => null,
-                'post' => $post
+                'post' => $post,
+                'categories'=>$this->categoryModel->asObject()->findAll()
             ];
 
             if ($this->request->getMethod() == 'post') {
-                $this->validation->setRules([
-                    'title' => [
-                        'label' => 'Projet', 'rules' => 'required',
-                        'errors' => ['required' => 'Le titre est réquis'],
-                    ],
-                    'description' => [
-                        'label' => 'Description', 'rules' => 'required',
-                        'errors' => ['required' => 'La description est requise'],
-                    ],
-                ]);
+                $this->validation->setRules(
+                    // Validation Rules from the UserModel 
+                    $this->postModel->getValidationRules(['except' => ['postImage']])
+                );
                 if ($this->validation->withRequest($this->request)->run()) {
                     $data = array(
                         'title' => $this->request->getVar('title'),
+                        'category_id' => $this->request->getVar('category_id'),
                         'slug' => strtolower(convert_accented_characters(url_title($this->request->getVar('title')))),
                         'description' => $this->request->getVar('description'),
                         'updated_at' => date('Y-m-d'),
                     );
 
                     $this->postModel->update($id, $data);
-                    session()->setFlashData("success", "Ajouté avec succès");
-                    return redirect()->to('/list-posts');
+                   
+                    return redirect()->to('/list-posts')->with("success", "Modifié avec succès");
                 } else {
                     $data['validation'] = $this->validation->getErrors();
                 }
             }
             echo view('posts/admin/edit', $data);
-        } else {
-            session()->setFlashData("error", "Aucune information trouvée pour la requête envoyée");
-            return redirect()->to('/list-posts');
+        } else {            
+            return redirect()->to('/list-posts')->with("error", "Aucune information trouvée pour la requête envoyée");
         }
     }
 
-
     function addImage($id)
     {
-        $post = $this->postModel->asObject()->where('postId', $id)->first();
+        $post = $this->postModel->asObject()->find($id);
 
         if (!empty($post)) {
 
@@ -143,31 +128,32 @@ class Posts extends BaseController
                 'validation' => null,
                 'post' => $post
             ];
+            $oldImage = $post->postImage;
+            $path = './public/assets/img/posts';
+
             if ($this->request->getMethod() == 'post') {
-                $rules = [
-                    'picture' => [
-                        'label' => 'Image',
-                        'rules' => 'uploaded[picture]|is_image[picture]|max_size[picture,5096]',
-                        'errors' => [
-                            'uploaded' => 'Ne doit pas être vide',
-                            'is_image' => 'Le format de cet image est inconnu',
-                            'max_size' => 'Ne doit pas dépasser 5 Mo de taille',
-                        ]
-                    ]
-                ];
+
+                $rules = // Validation Rules from the UserModel 
+                $this->postModel->getValidationRules(['only' => ['postImage']]);
+
                 if ($this->validate($rules)) {
                     $file = $this->request->getFile('picture');
 
                     if ($file->isValid() && !$file->hasMoved()) {
                         $imageName = $file->getRandomName();
 
-                        $data = ['picture' => $imageName];
+                        $data = ['postImage' => $imageName];
+
+                        //Delete the old image if it does exists
+                        if(file_exists($path .'/'. $oldImage) && $oldImage !== null){
+                            unlink($path .'/'. $oldImage);
+                        }
 
                         $this->postModel->update($id, $data);
 
-                        $file->move('./public/assets/es_admin/images/posts', $imageName);
-                        session()->setFlashData("success", "Mise à jour effectué avec succès !");
-                        return redirect()->to('/list-posts');
+                        $file->move($path, $imageName);
+
+                        return redirect()->to('/list-posts')->with("success", "Mise-à-jour effectué avec succès !");
                     }
                 } else {
                     $data['validation'] = $this->validation->getErrors();
@@ -180,55 +166,168 @@ class Posts extends BaseController
         }
     }
 
-    public function detail($slug)
+    function delete($id)
     {
-        $post = $this->postModel->asObject()->where('slug', $slug)->first();
+        $post = $this->postModel->asObject()->find($id);
+
         if (!empty($post)) {
-            $data = [
-                'page' => 'detail-activity',
-                'title' => $post->title . ' | ' . altData(),
-                'post' => $post,
-                'posts' => $this->postModel->asObject()->where('slug!=', $slug)->findAll(3),
-                'contacts' => $this->coordModel->asObject()->first(),
-                'user_data' => session()->get('user_data')
-            ];
-            return view('posts/post_detail', $data);
-        } else {
-            $data['msg'] = "Aucune information n'a été trouvé pour la requête envoyée !";
-            return view('errors/error_404', $data);
+            $data = ['is_deleted' => '1'];
+
+            $this->postModel->update($id, $data);
+            return redirect()->to('/list-posts')->with("success", "Suppression succès");
         }
     }
 
-    function delete($id)
+    public function removeAsFeatured($id)
+    {
+        $post = $this->postModel->asObject()->find($id);
+
+        if (!empty($post)) {
+            $data = ['is_featured' => '0'];
+
+            $this->postModel->update($id, $data);
+            return redirect()->to('/list-posts')->with("success", "Opération effectuée");
+        }
+    }
+
+    public function makeAsFeatured($id)
+    {
+        $post = $this->postModel->asObject()->find($id);
+
+        if (!empty($post)) {
+            $data = ['is_featured' => '1'];
+            $this->postModel->update($id, $data);
+            return redirect()->to('/list-posts')->with("success", "Opération effectuée");
+        }
+    }
+    public function makeAsMostFormat($id)
+    {
+        $post = $this->postModel->asObject()->find($id);
+
+        if (!empty($post)) {
+            $data = ['is_most_format' => '1'];
+            $this->postModel->update($id, $data);
+            return redirect()->to('/list-posts')->with("success", "Opération effectuée");
+        }
+
+    }
+    public function removeAsMostFormat($id)
+    {
+        $post = $this->postModel->asObject()->find($id);
+
+        if (!empty($post)) {
+            $data = ['is_most_format' => '0'];
+            $this->postModel->update($id, $data);
+            return redirect()->to('/list-posts')->with("success", "Opération effectuée");
+        }
+    }
+
+    public function detail($slug)
+    {
+        $new = $this->postModel->asObject()->where('slug', $slug)->first();
+        if (!empty($new)) {
+            //Update post view number
+            $this->postView($new->postId);
+
+            $data = [
+                'title' => $new->title,
+                'page' => 'post-details',
+                'new' => $new,
+                'news' => $this->postModel->asObject()
+                    ->where(['slug !=' => $slug])
+                    ->orderBy('postId', 'DESC')->findAll(3),
+                'most_reads' => $this->postModel->asObject()
+                    ->join('categories', 'posts.category_id=categories.categoryId')
+                    ->orderBy('viewNumber', 'DESC')
+                    ->where(['is_deleted' => '0'])->findAll(4),
+                'categories' => $this->postModel->postNumberByCategory(),
+                'user_data' => session()->get('user_data')
+            ];
+            return view('posts/detail', $data);
+        } else {
+            return view('errors/error_404');
+        }
+    }
+
+    //Add view number
+    function postView($postId)
+    {
+        $post = $this->postModel->asObject()->where('postId', $postId)->first();
+        $data = ['viewNumber' => $post->viewNumber + 1];
+        $this->postModel->update($postId, $data);
+    }
+
+
+    public function news()
     {
         $data = [
-            'project' => $this->projectModel->getProject($id),
+            'title' => "Actualités || RCL",
+            'subtitle' => 'Radio Communautaire du Lualaba RCL',
+            'posts' => $this->postModel->asObject()
+                ->join('categories', 'posts.category_id=categories.categoryId')
+                ->where(['is_deleted' => '0'])
+                ->orderBy('postId', 'DESC')->findAll(),
+
+            'page' => 'news',
+
+            'news' => $this->postModel->asObject()
+                ->join('categories', 'posts.category_id=categories.categoryId')
+                ->orderBy('postId', 'DESC')
+                ->where(['is_featured' => '', 'is_deleted' => '0'])->findAll(),
+
+            'podcasts' => $this->podcastModel->asObject()
+                ->join('categories', 'podcasts.category_id=categories.categoryId')
+                ->where('is_deleted', 0)
+                ->orderBy('podcastId', 'DESC')->findAll(5),
+
+            'one_post_by_category' => $this->postModel->onePostByCategory(),
+            'categories' => $this->postModel->postNumberByCategory(),
+            'user_data' => session()->get('user_data')
         ];
-        if (!empty($data)) {
-            $this->projectModel->where('proj_id', $id)->delete();
-            $session = session();
-            $session->setFlashData("success", "Projet supprimé avec succès");
-            return redirect()->to('/project-list');
+        echo view('posts/news', $data);
+    }
+
+    public function postByCategory($categorySlug)
+    {
+        $category = $this->categoryModel->asObject()->where('category_slug', $categorySlug)->first();
+
+        if (!empty($category)) {
+            $data = [
+                'title' => "Actualités | {$category->name}",
+                'page' => 'news-by-category',
+                'subtitle' => 'Radio Communautaire du Lualaba RCL',
+                'posts' => $this->postModel->asObject()
+                    ->join('categories', 'posts.category_id=categories.categoryId')
+                    ->where(['is_deleted' => '0', 'category_id' => $category->categoryId])->findAll(),
+                'news' => $this->postModel->asObject()
+                    ->join('categories', 'posts.category_id=categories.categoryId')
+                    ->orderBy('postId', 'DESC')
+                    ->where(['is_featured' => '', 'is_deleted' => '0'])->findAll(3),
+                'user_data' => session()->get('user_data')
+            ];
+            echo view('posts/post-by-category', $data);
+
+        } else {
+            echo view('errors/404');
         }
     }
 
     public function search()
     {
-        $keyword = htmlentities($this->request->getVar('key'));
+        $request = htmlspecialchars($this->request->getVar('search'));
 
-        $data = [
-            'page' => 'activities',
-            'title' => 'Activités récentes | ' . altData(),
-            'requests' => "Résultats pour <b class='text-success'>{$keyword}</b>",
-            'contacts' => $this->coordModel->asObject()->first(),
-            'user_data' => session()->get('user_data'),
-            'posts' => $this->postModel->asObject()
-                ->like('title', $keyword)
-                ->orLike('description', $keyword)
-                ->where('is_deleted', 'N')
-                ->orderBy('postId', 'DESC')->findAll()
-        ];
-        return view('posts/index', $data);
+        if ($request != null) {
+            $data = [
+                'title' => "Résultat de <b style='color: rgba(155,64,250,0.82); font-style: italic; text-transform: lowercase'> $request</b>",
+                'page' => 'search',
+                'posts' => $this->postModel->asObject()
+                    ->join('categories', 'posts.category_id=categories.categoryId')
+                    ->like('title', $request)->orLike('description', $request)->orLike('name', $request)
+                    ->orderBy('postId', 'DESC')->findAll(),
+                'user_data' => session()->get('user_data')
+            ];
+            echo view('posts/search', $data);
+        }
     }
 
 }

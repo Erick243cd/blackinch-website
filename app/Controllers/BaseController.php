@@ -7,6 +7,7 @@ use App\Models\CategoryModel;
 use App\Models\CoordonneeModel;
 use App\Models\MessageModel;
 use App\Models\PodcastModel;
+use App\Models\PostModel;
 use App\Models\ServiceModel;
 use App\Models\RoleModel;
 use App\Models\UserModel;
@@ -84,8 +85,7 @@ abstract class BaseController extends Controller
         $this->roleModel = new RoleModel();
         $this->userModel = new UserModel();
         $this->carouselModel = new CarouselModel();
-        $this->postModel = new PodcastModel();
-
+        $this->postModel = new PostModel();
         $this->messageModel = new MessageModel();
 
         // Preload any models, libraries, etc, here.
