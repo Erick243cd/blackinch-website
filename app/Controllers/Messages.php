@@ -13,41 +13,19 @@ class Messages extends BaseController
         $data = [
             'title'         => "Nous Contacter'",
             'validation'    => null,
-            'coords'    =>  $this->coordModel->first()
+            'page' => 'contact',
+            'subtitle' => 'Blackinch SARL',
+            'services' => $this->serviceModel->asObject()
+                ->orderBy('serviceId', 'DESC')
+                ->where('is_deleted', '0')->findAll(5),
+            'sys_data' => $this->coordonneeModel->asObject()->first(),
+            'user_data' => session()->get('user_data')
         ];
+        // Get Validations Rules from the model
+        $rules = $msgModel->getValidationRules();
+        
         if ($this->request->getMethod() == 'post') {
-            $this->validation->setRules([
-                'sender' => [
-                    'label' => 'Nom','rules' => 'required',
-                    'errors' => ['required' => 'Votre nom est réquis'],
-                ],
-                'email'       => [
-                    'label'     => 'Email',
-                    'rules'     => 'required|valid_email',
-                    'errors'    => [
-                        'required'      => 'Complètez ce champ',
-                        'valid_email'   => 'Entrez une adresse email valide.'
-                    ]
-                ],
-                'phone'  => [
-                    'label' => 'Téléphone', 'rules' => 'required',
-                    'errors' => [
-                        'required' => 'Complètez votre numéro de téléphone',
-                    ]
-                ],
-                'subject'  => [
-                    'label' => 'Objet', 'rules' => 'required',
-                    'errors' => [
-                        'required' => 'Complètez ce champ',
-                    ]
-                ],
-                'message'  => [
-                    'label' => 'Message', 'rules' => 'required',
-                    'errors' => [
-                        'required' => 'Remplissez votre message dans le champ ci-haut',
-                    ]
-                ],
-            ]);
+            $this->validation->setRules($rules);
             if ($this->validation->withRequest($this->request)->run()) {  
                 
                 $data = array(
@@ -58,13 +36,13 @@ class Messages extends BaseController
                     'subject'       => $this->request->getVar('subject'),
                     'created_at'    => date('Y-m-d'),
                 ); 
-                $msgModel->insert($data);
-        
+                
                 $this->sendMessageToClient($data['email'], $data['sender']);
-                $this->sendMessageToAdmin($data['email'], $data['sender'],$data['phone'],$data['message']);
-                $session = session();
-                $session->setFlashData("success", "Ajouté avec succès");
-                return redirect()->to('/dashboard');                    
+                $this->sendMessageToAdmin($data['email'], $data['sender'],$data['phone'],$data['subject'],$data['message']);
+
+                $msgModel->insert($data);
+    
+                return redirect()->back()->with('success', 'Votre message été envoyé avec succès.');                    
                
             } else {
                 $data['validation'] = $this->validation->getErrors();
@@ -73,12 +51,11 @@ class Messages extends BaseController
         echo view('pages/contact', $data);
     }
     function sendMessageToClient($to, $name){
-        $subject= "Inscription sur Eldad Services";
-        // $content = "Nous vous envoyons ce mail pour vous confirmer de votre inscription sur notre site Eldad Services. <br>
-        //             Le mot de passe par défaut est 123456, connectez-vous pour le modifier";
-        $this->email->setFrom('info@eldadservices.com', 'Admin Eldad Services');
+        
+        $subject= "Votre message sur Blackinch";
+      
+        $this->email->setFrom('info@blackinch.com', 'Blackinch Support');
         $this->email->setTo($to);
-        $this->email->setCC('archangeche@gmail.com');
         $this->email->setSubject($subject);
         $this->email->setMessage($this->mailContentClient($name));
         if($this->email->send()){
@@ -93,13 +70,9 @@ class Messages extends BaseController
         ];
         return view('mails/message', $data);
     }
-    function sendMessageToAdmin($from, $name,$phone,$msg){
-        $subject= "Message sur Eldad Services";
-        // $content = "Nous vous envoyons ce mail pour vous confirmer de votre inscription sur notre site Eldad Services. <br>
-        //             Le mot de passe par défaut est 123456, connectez-vous pour le modifier";
+    function sendMessageToAdmin($from,$name,$phone,$subject,$msg){  
         $this->email->setFrom($from);
-        $this->email->setTo('info@eldadservices.com');
-        $this->email->setCC('archangeche@gmail.com');
+        $this->email->setTo('info@blackinch.com');
         $this->email->setSubject($subject);
         $this->email->setMessage($this->mailContentAdmin($name,$phone,$msg));
         if($this->email->send()){
@@ -114,6 +87,6 @@ class Messages extends BaseController
             'phone'   => $phone,
             'msg'     => $msg,
         ];
-        return view('mails/admin_admin', $data);
+        return view('mails/admin', $data);
     }
 }

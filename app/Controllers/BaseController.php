@@ -5,6 +5,7 @@ namespace App\Controllers;
 use App\Models\CarouselModel;
 use App\Models\CategoryModel;
 use App\Models\CoordonneeModel;
+use App\Models\MessageModel;
 use App\Models\PodcastModel;
 use App\Models\ServiceModel;
 use App\Models\RoleModel;
@@ -35,6 +36,20 @@ abstract class BaseController extends Controller
      * @var CLIRequest|IncomingRequest
      */
     protected $request;
+
+    public $userModel;
+    public $serviceModel;
+    public $podcastModel;
+    public $categoryModel;
+    public $coordonneeModel;
+    public $roleModel;
+    public $carouselModel;
+    public $postModel;
+    public $messageModel;
+    public $session;
+    public $email;
+
+    public $validation;
 
     /**
      * An array of helpers to be loaded automatically upon
@@ -69,10 +84,14 @@ abstract class BaseController extends Controller
         $this->roleModel = new RoleModel();
         $this->userModel = new UserModel();
         $this->carouselModel = new CarouselModel();
+        $this->postModel = new PodcastModel();
+        $this->messageModel = new MessageModel();
+        
 
         // Preload any models, libraries, etc, here.
         helper(['text', 'form', 'url', 'custom']);
         $this->session = Services::session();
         $this->validation = Services::validation();
+        $this->email = \Config\Services::email();
     }
 }

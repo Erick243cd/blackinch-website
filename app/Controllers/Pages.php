@@ -48,6 +48,8 @@ class Pages extends BaseController
             'sys_data' => $this->coordonneeModel->asObject()->first(),
             'user_data' => session()->get('user_data')
         ];
+
         echo view('pages/contact', $data);
     }
+    
 }

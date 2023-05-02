@@ -55,24 +55,46 @@
                             <h2 class="h4 fw-bold"></h2>
                         </div>
                     </div>
-                    <form action="#" class="row">
-                        <div class="col-md-6">
+                  
+                    <?=form_open('message','id="contact-form" class="row"');?>
+                        <?= csrf_field();?>
+                        <div class="col-md-6 mb-4">
                             <div class="mb-3 mb-md-0">
-                                <input type="email" class="form-control" placeholder="Votre email">
+                                <input type="text" class="form-control" placeholder="Votre nom" name="sender" value="<?=old('sender')?>">
+                                <small id="input-help" class="form-text text-danger"><?= $validation['sender'] ?? null; ?></small>
                             </div>
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-md-6 mb-4">
                             <div class="mb-3 mb-md-0">
-                                <input type="email" class="form-control" placeholder="Objet">
+                                <input type="email" class="form-control" placeholder="Votre email" name="email" value="<?=old('email')?>">
+                                <small id="input-help" class="form-text text-danger"><?= $validation['email'] ?? null; ?></small>
                             </div>
                         </div>
-                        <div class="col-md-12 mt-5">
+                        <div class="col-md-6 mb-4">
                             <div class="mb-3 mb-md-0">
-                             <textarea class="form-control" name="" id="" cols="30" rows="10" placeholder="Message"></textarea>
+                                <input type="tel" class="form-control" placeholder="Téléphone" name="phone" value="<?=old('phone')?>">
+                                <small id="input-help" class="form-text text-danger"><?= $validation['phone'] ?? null; ?></small>
                             </div>
                         </div>
+                        <div class="col-md-6 mb-4">
+                            <div class="mb-3 mb-md-0">
+                                <input type="text" class="form-control" placeholder="Objet" name="subject" value="<?=old('subject')?>">
+                                <small id="input-help" class="form-text text-danger"><?= $validation['subject'] ?? null; ?></small>
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <div class="mb-3 mb-md-0">
+                             <textarea class="form-control" name="message" id="" cols="30" rows="2" placeholder="Message"><?= old('message')?></textarea>
+                             <small id="input-help" class="form-text text-danger"><?= $validation['message'] ?? null; ?></small>
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <?php if(session()->getFlashdata('success')):?>
+                                <div class="alert alert-primary" style="font-size:16px; color:green"><?=session()->getFlashdata('success');?></div>
+                            <?php endif;?>
+                        </div>                       
                         <div class="col-md-4 d-grid mt-5">
-                            <input type="submit" class="btn btn-primary" value="Envoyer">
+                            <input type="submit" class="btn btn-primary" name="contact" id="contact" value="Envoyer">
                         </div>
                     </form>
                 </div>
