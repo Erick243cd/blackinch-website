@@ -119,15 +119,21 @@
                 <li class="<?= (isset($page) && $page == 'about') ? 'active' : '' ?>"><a
                             href="<?= (isset($page) && $page == 'about' ? "#" : site_url('about')) ?>">A propos</a></li>
                 <li class="<?= (isset($page) && $page == 'contact') ? 'active' : '' ?>"><a
-                            href="<?= (isset($page) && $page == 'about' ? "#" : site_url('contact')) ?>">Contact</a>
+                            href="<?= (isset($page) && $page == 'contact' ? "#" : site_url('contact')) ?>">Contact</a>
                 </li>
+
+
 
                 <li class="<?= (isset($page) && $page == 'posts') ? 'active' : '' ?>"><a
                             href="<?= (isset($page) && $page == 'about' ? "#" : site_url('posts')) ?>">Activités</a>
                 </li>
-
-                <li><a href="#">Dashboard</a></li>
-                <li><a href="#">Logout</a></li>
+                <?php if (isset($user_data)): ?>
+                    <li><a onclick="return confirm('Etes-vous sûr de vous déconnecter ?')"
+                           href="<?= site_url('logout') ?>">Logout</a></li>
+                    <li><a href="<?= site_url('dashboard') ?>">Dashboard</a></li>
+                <?php else: ?>
+                    <li><a href="<?= site_url('login') ?>">Login</a></li>
+                <?php endif; ?>
             </ul>
         </div>
     </div>

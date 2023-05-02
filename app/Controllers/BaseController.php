@@ -69,6 +69,7 @@ abstract class BaseController extends Controller
         $this->roleModel = new RoleModel();
         $this->userModel = new UserModel();
         $this->carouselModel = new CarouselModel();
+        $this->postModel = new PodcastModel();
 
         // Preload any models, libraries, etc, here.
         helper(['text', 'form', 'url', 'custom']);
