@@ -248,7 +248,7 @@ $user_data = session()->get('user_data');
 <script src="<?= base_url() ?>/public/assets/es_admin/js/plugins/bootstrap.min.js"></script>
 <script src="<?= base_url() ?>/public/assets/es_admin/js/ripple.js"></script>
 <script src="<?= base_url() ?>/public/assets/es_admin/js/pcoded.min.js"></script>
-<script src="<?= base_url() ?>/public/assets/es_admin/js/menu-setting.min.js"></script>
+<!-- <script src="<?= base_url() ?>/public/assets/es_admin/js/menu-setting.min.js"></script> -->
 
 <!-- Apex Chart -->
 <script src="<?= base_url() ?>/public/assets/es_admin/js/plugins/apexcharts.min.js"></script>
@@ -264,10 +264,10 @@ $user_data = session()->get('user_data');
 
 <!-- notification Js -->
 <script src="<?= base_url() ?>/public/assets/es_admin/js/plugins/bootstrap-notify.min.js"></script>
-<script src="<?= base_url() ?>/public/assets/es_admin/js/pages/ac-notification.js"></script>
+<!-- <script src="<?= base_url() ?>/public/assets/es_admin/js/pages/ac-notification.js"></script> -->
 <!-- file-upload Js -->
 <script src="<?= base_url() ?>/public/assets/es_admin/js/plugins/dropzone-amd-module.min.js"></script>
-<script src="<?= base_url() ?>/public/assets/es_admin/js/menu-setting.min.js"></script>
+<script src="</?= base_url() ?>/public/assets/es_admin/js/menu-setting.min.js"></script>
 <!-- select2 Js -->
 <script src="<?= base_url() ?>/public/assets/es_admin/js/plugins/select2.full.min.js"></script>
 <!-- form-select-custom Js -->

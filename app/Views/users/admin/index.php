@@ -83,16 +83,19 @@
                                                     <span class="badge badge-light-success">Activé</span>
                                                 <?php endif ?>
                                                 <div class="overlay-edit">
-                                                    <a type="button" class="btn btn-icon btn-success"
-                                                       data-toggle="tooltip" data-placement="top"
-                                                       title="Activer/Désactiver"
-                                                       href="<?= site_url('active-user/' . $row->u_id) ?>"><i
-                                                                class="feather icon-check-circle"></i></a>
-                                                    <a type="button" href="<?= site_url('delete-user/' . $row->u_id) ?>"
-                                                       data-toggle="tooltip" data-placement="top" title="Supprimer"
-                                                       class="btn btn-icon btn-danger"
-                                                       onclick="return confirm('Etes-vous sûr de supprimer cet utilisateur ?')">
-                                                        <i class="feather icon-trash-2"></i></a>
+                                                    <?php if($user_data['u_id'] !== $row->u_id):?>
+                                                        <a type="button" class="btn btn-icon btn-success"
+                                                        data-toggle="tooltip" data-placement="top"
+                                                        title="Activer/Désactiver"
+                                                        href="<?= site_url('active-user/' . $row->u_id) ?>"><i
+                                                                    class="feather icon-check-circle"></i></a>
+                                                   
+                                                        <a type="button" href="<?= site_url('delete-user/' . $row->u_id) ?>"
+                                                        data-toggle="tooltip" data-placement="top" title="Supprimer"
+                                                        class="btn btn-icon btn-danger"
+                                                        onclick="return confirm('Etes-vous sûr de supprimer cet utilisateur ?')">
+                                                            <i class="feather icon-trash-2"></i></a>
+                                                    <?php endif;?>
                                                 </div>
                                             </td>
                                         </tr>

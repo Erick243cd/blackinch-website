@@ -41,6 +41,8 @@ $routes->get('/contact', 'Pages::contact');
 $routes->get('/about', 'Pages::about');
 $routes->post('/search-service', 'Services::search');
 
+$routes->match(['get', 'post'],'message', 'Messages::index');
+
 $routes->get('/logout', 'Auth::logout');
 
 $routes->group('', ['filter' => 'AuthCheck'], function ($routes) {
