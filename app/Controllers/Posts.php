@@ -93,7 +93,7 @@ class Posts extends BaseController
             if ($this->request->getMethod() == 'post') {
                 $this->validation->setRules(
                     // Validation Rules from the UserModel 
-                    $this->postModel->getValidationRules(['except' => ['postImage']])
+                    $this->postModel->getValidationRules(['except' => ['picture']])
                 );
                 if ($this->validation->withRequest($this->request)->run()) {
                     $data = array(
