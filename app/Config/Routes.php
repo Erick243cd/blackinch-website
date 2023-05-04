@@ -31,40 +31,41 @@ $routes->set404Override();
 // We get a performance increase by specifying the default
 // route since we don't have to scan directories.
 $routes->get('/', 'Pages::index');
+$routes->get('/about', 'Pages::about');
+$routes->get('/contact', 'Pages::contact');
 $routes->get('/home', 'Pages::index');
+$routes->get('/posts', 'Posts::posts');
+$routes->get('/podcasts', 'Podcasts::index');
+$routes->get('/live-radio', 'Pages::liveRadio');
+$routes->get('/services', 'Services::serviceList');
 $routes->get('/service-detail/(:any)', 'Services::detail/$1');
 $routes->get('/posts-by-category/(:any)', 'Services::postByCategory/$1');
-$routes->get('/podcasts', 'Podcasts::index');
-$routes->get('/services', 'Services::serviceList');
-$routes->get('/live-radio', 'Pages::liveRadio');
-$routes->get('/contact', 'Pages::contact');
-$routes->get('/about', 'Pages::about');
 $routes->post('/search-service', 'Services::search');
 
 $routes->match(['get', 'post'],'message', 'Messages::index');
 
-$routes->get('/logout', 'Auth::logout');
 
 $routes->group('', ['filter' => 'AuthCheck'], function ($routes) {
-    //Protected routes
-    $routes->get('/dashboard', 'Dashboard::index');
-    $routes->get('/profile', 'Auth::profile');
-    $routes->get('/settings', 'Auth::settings');
-
-
-    $routes->get('list-users', 'Users::index');
-    $routes->get('/add-picture', 'Users::addImage');
-    $routes->get('/save-picture', 'Users::saveImage');
-    $routes->get('/delete-user/(:any)', 'Users::deleteUser/$1');
-    $routes->get('/active-user/(:any)', 'Users::active/$1');
-
-    $routes->post('/save-picture', 'Users::saveImage');
-    $routes->get('/add-user', 'Users::create');
-    $routes->post('/add-user', 'Users::create');
-
-    $routes->get('/add-member', 'Team::create');
+    //Protected routes   
+    
+    // Auth 
     $routes->get('/change-pwd', 'Auth::change');
+    $routes->get('/logout', 'Auth::logout');
 
+    // Coords
+    $routes->get('coords', 'Coords::index');
+    $routes->get('coords-update', 'Coords::update');
+
+    // Podcasts
+    $routes->get('list-podcasts', 'Podcasts::list');
+    $routes->get('add-podcast', 'Podcasts::create');
+    $routes->post('add-podcast', 'Podcasts::create');
+    $routes->get('delete-podcast/(:any)', 'Podcasts::delete/$1');
+    $routes->get('podcast-edit/(:any)', 'Podcasts::edit/$1');
+    $routes->post('podcast-edit/(:any)', 'Podcasts::edit/$1');
+    
+
+    // Posts
     $routes->get('add-post', 'Posts::create');
     $routes->post('add-post', 'Posts::create');
 
@@ -81,21 +82,31 @@ $routes->group('', ['filter' => 'AuthCheck'], function ($routes) {
     $routes->get('list-posts', 'Posts::index');
     $routes->get('post-image/(:any)', 'Posts::addImage/$1');
     $routes->post('post-image/(:any)', 'Posts::addImage/$1');
-    $routes->post('save-post-picture', 'Posts::saveImage');
 
+  
+    // Services
+    $routes->match(['get','post'], 'add-service', 'Services::create');
+    $routes->match(['get','post'], 'edit-service/(:any)', 'Services::edit/$1');
+    $routes->get('delete-service/(:any)', 'Services::delete/$1');
+    $routes->get('list-services', 'Services::index');
+    $routes->match(['get','post'],'service-image/(:any)', 'Services::addImage/$1');   
 
-    $routes->get('list-podcasts', 'Podcasts::list');
-    $routes->get('add-podcast', 'Podcasts::create');
-    $routes->post('add-podcast', 'Podcasts::create');
-    $routes->get('delete-podcast/(:any)', 'Podcasts::delete/$1');
-    $routes->get('podcast-edit/(:any)', 'Podcasts::edit/$1');
-    $routes->post('podcast-edit/(:any)', 'Podcasts::edit/$1');
+    // Team
+    $routes->get('/add-member', 'Team::create');
 
+    // Users
+    $routes->get('/dashboard', 'Dashboard::index');
+    $routes->get('/profile', 'Auth::profile');
+    $routes->get('/settings', 'Auth::settings');
+    $routes->get('list-users', 'Users::index');
+    $routes->get('/add-picture', 'Users::addImage');
+    $routes->get('/save-picture', 'Users::saveImage');
+    $routes->get('/delete-user/(:any)', 'Users::deleteUser/$1');
+    $routes->get('/active-user/(:any)', 'Users::active/$1');
+    $routes->post('/save-picture', 'Users::saveImage');
+    $routes->get('/add-user', 'Users::create');
+    $routes->post('/add-user', 'Users::create');
 
-
-
-    $routes->get('coords', 'Coords::index');
-    $routes->get('coords-update', 'Coords::update');
 
 });
 

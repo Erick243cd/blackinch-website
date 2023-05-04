@@ -110,6 +110,15 @@ $user_data = session()->get('user_data');
 
                     <li class="nav-item pcoded-hasmenu">
                         <a href="#!" class="nav-link "><span class="pcoded-micon"><i
+                                        class="feather icon-layers text-danger"></i></span><span
+                                    class="pcoded-mtext">Services</span></a>
+                        <ul class="pcoded-submenu">
+                            <li><a href="<?= site_url() ?>add-service">Ajouter</a></li>
+                            <li><a href="<?= site_url() ?>list-services">Liste</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item pcoded-hasmenu">
+                        <a href="#!" class="nav-link "><span class="pcoded-micon"><i
                                         class="feather icon-users text-info"></i></span><span
                                     class="pcoded-mtext">Utilisateurs</span></a>
                         <ul class="pcoded-submenu">

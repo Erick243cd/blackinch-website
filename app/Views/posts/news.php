@@ -56,8 +56,8 @@
                                 alt=""></a>
                     <div class="post-body">
                         <div class="post-meta">
-                            <a class="post-category cat-<?= $item->category_color ?>"
-                               href="#"><?= $item->name ?></a>
+                            <a class="post-category cat-<?= $item->category_color ?? '' ?>"
+                               href="#"><?= $item->title ?></a>
                             <span class="post-date"><?= date('M d, Y', strtotime($item->created_at)) ?></span>
                         </div>
                         <h3 class="post-title"><a
@@ -81,7 +81,7 @@
                         <?php foreach ($categories as $category): ?>
                             <li><a href="<?= site_url('posts-by-category/' . $category->category_slug) ?>"
                                    class="cat-<?= $category->category_color ?>"><?= $category->name ?>
-                                    <span><?= $category->nb_categories ?></span></a></li>
+                                    <span><?= $category->nb_categories ?? '' ?></span></a></li>
                         <?php endforeach; ?>
                     </ul>
                 </div>

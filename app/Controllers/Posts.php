@@ -17,30 +17,33 @@ class Posts extends BaseController
                 ->where('is_deleted', '0')->findAll()
         ];
         return view('posts/admin/list', $data);
-        return view('posts/admin/list', $data);
     }
 
     public function posts()
     {
         $data = [
-            'page' => 'activities',
-            'user_data' => session()->get('user_data'),
-            'title' => 'Activités récentes | ' . altData(),
-            'contacts' => $this->coordonneeModel->asObject()->first(),
+            'page'         => 'activities',
+            'user_data'    => session()->get('user_data'),
+            'title'        => 'Activités récentes | ' . altData(),
+            'contacts'     => $this->coordonneeModel->asObject()->first(),
+            'podcasts'     => $this->podcastModel->asObject()->findAll(),
+            'categories'   => $this->categoryModel->asObject()->findAll(),
+            'services' => $this->serviceModel->asObject()->where('is_deleted', '0')->findAll(),
+            'sys_data' => $this->coordonneeModel->asObject()->first(),
             'posts' => $this->postModel->asObject()
                 ->join('categories', 'categories.categoryId=posts.category_id')
                 ->where('is_deleted', '0')->findAll()
         ];
-        return view('posts/admin/list', $data);
+        return view('posts/news', $data);
     }
 
 
     public function create()
-    {
-        $user = session()->get('user_data');
+    {       
         $data = [
             'title' => "Nouvelle Activité",
             'validation' => null,
+            'user_data' => session()->get('user_data'),
             'categories' => $this->categoryModel->asObject()->findAll()
         ];
         // Get Validation rules from the model
@@ -69,7 +72,6 @@ class Posts extends BaseController
                     return redirect()->to('/list-posts')->with("success", "Ajouté avec succès");
                 }
             } else {
-                // die('Fuck yourself');
                 $data['validation'] = $this->validation->getErrors();
             }
         }
@@ -129,12 +131,12 @@ class Posts extends BaseController
                 'post' => $post
             ];
             $oldImage = $post->postImage;
-            $path = './public/assets/img/posts';
+            $path = './public/assets/es_admin/images/posts';
 
             if ($this->request->getMethod() == 'post') {
 
                 $rules = // Validation Rules from the UserModel 
-                $this->postModel->getValidationRules(['only' => ['postImage']]);
+                $this->postModel->getValidationRules(['only' => ['picture']]);
 
                 if ($this->validate($rules)) {
                     $file = $this->request->getFile('picture');

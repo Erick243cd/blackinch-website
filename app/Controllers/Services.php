@@ -12,9 +12,8 @@ class Services extends BaseController
             'title' => "Services | " . altData(),
             'services' => $this->serviceModel->asObject()->where('is_deleted', '0')->findAll()
         ];
-        return view('posts/admin/list', $data);
+        return view('services/admin/list', $data);
     }
-
 
     public function create()
     {
@@ -23,26 +22,11 @@ class Services extends BaseController
             'title' => "Nouvelle Activité",
             'validation' => null
         ];
-        if ($this->request->getMethod() == 'post') {
-            $this->validation->setRules([
-                'title' => [
-                    'label' => 'Post', 'rules' => 'required',
-                    'errors' => ['required' => 'Le titre est requis'],
-                ],
-                'description' => [
-                    'label' => 'Description', 'rules' => 'required',
-                    'errors' => ['required' => 'La description est requise'],
-                ],
-                'picture' => [
-                    'label' => 'Picture',
-                    'rules' => 'uploaded[picture]|is_image[picture]|max_size[picture,5096]',
-                    'errors' => [
-                        'uploaded' => 'Ne doit pas être vide',
-                        'is_image' => 'Le format de cet image est inconnu',
-                        'max_size' => 'Ne doit pas dépasser 5 Mo de taille',
-                    ]
-                ]
-            ]);
+
+        if ($this->request->getMethod() === 'post') {
+            $this->validation->setRules(
+                $this->serviceModel->getValidationRules()
+            );
             if ($this->validation->withRequest($this->request)->run()) {
 
                 $file = $this->request->getFile('picture');
@@ -51,79 +35,58 @@ class Services extends BaseController
                     $imageName = $file->getRandomName();
 
                     $data = array(
-                        'title' => $this->request->getVar('title'),
-                        'category_id' => $this->request->getVar('category_id'),
-                        'slug' => strtolower(convert_accented_characters(url_title($this->request->getVar('title')))),
+                        'name' => $this->request->getVar('name'),
+                        'slug' => strtolower(convert_accented_characters(url_title($this->request->getVar('name')))),
                         'description' => $this->request->getVar('description'),
-                        'postImage' => $imageName,
+                        'picture' => $imageName,
                         'created_at' => date('Y-m-d'),
                         'updated_at' => date('Y-m-d'),
                     );
 
-                    $this->postModel->save($data);
+                    $this->serviceModel->save($data);
 
-                    $file->move('./public/assets/img/posts', $imageName);
+                    $file->move('./public/assets/es_admin/images/services', $imageName);
 
-                    session()->setFlashData("success", "Ajouté avec succès");
-                    return redirect()->to('/list-posts');
+                    return redirect()->to('/list-services')->with("success", "Ajouté avec succès");
                 }
             } else {
                 $data['validation'] = $this->validation->getErrors();
             }
         }
-        echo view('posts/admin/create', $data);
+        echo view('services/admin/create', $data);
     }
 
     public function edit($id)
-    {
-        $post = $this->postModel->asObject()
-            ->join('categories', 'categories.categoryId=posts.category_id')
-            ->where('postId', $id)->first();
+    {        
+        $service = $this->serviceModel->asObject()->find($id);
 
-        if (!empty($post)) {
+        if (!empty($service)) {
             $data = [
-                'title' => "Modifier le post",
+                'title' => "Modifier le service",
                 'validation' => null,
-                'post' => $post,
-                'categories' => $this->categoryModel->asObject()->findAll()
+                'service' => $service,
             ];
-
+            $rules = $this->serviceModel->getValidationRules(['except' => ['picture']]);
             if ($this->request->getMethod() == 'post') {
-                $this->validation->setRules([
-                    'title' => [
-                        'label' => 'Titre', 'rules' => 'required',
-                        'errors' => ['required' => 'Le titre est requis'],
-                    ], 'category_id' => [
-                        'label' => 'Catégorie', 'rules' => 'required',
-                        'errors' => ['required' => 'La catégorie est requise'],
-                    ],
-                    'description' => [
-                        'label' => 'Description', 'rules' => 'required',
-                        'errors' => ['required' => 'La description est requise'],
-                    ],
-                ]);
+                $this->validation->setRules($rules);
                 if ($this->validation->withRequest($this->request)->run()) {
                     $data = array(
-                        'title' => $this->request->getVar('title'),
-                        'category_id' => $this->request->getVar('category_id'),
-                        'slug' => strtolower(convert_accented_characters(url_title($this->request->getVar('title')))),
+                        'name' => $this->request->getVar('name'),
+                        'slug' => strtolower(convert_accented_characters(url_title($this->request->getVar('name')))),
                         'description' => $this->request->getVar('description'),
                         'updated_at' => date('Y-m-d'),
                     );
 
+                    $this->serviceModel->update($id, $data);
 
-                    $this->postModel->update($id, $data);
-
-                    session()->setFlashData("success", "Ajouté avec succès");
-                    return redirect()->to('/list-posts');
+                    return redirect()->to('/list-services')->with("success", "Modifié avec succès");
                 } else {
                     $data['validation'] = $this->validation->getErrors();
                 }
             }
-            echo view('posts/admin/edit', $data);
+            echo view('services/admin/edit', $data);
         } else {
-            session()->setFlashData("error", "Aucune information trouvée pour la requête envoyée");
-            return redirect()->to('/list-posts');
+            return redirect()->to('/list-posts')->with("error", "Aucune information trouvée pour la requête envoyée");
         }
     }
 
@@ -134,41 +97,30 @@ class Services extends BaseController
         if (!empty($post)) {
 
             $data = [
-                'title' => "Modifier l'image de l'activité",
+                'title' => "Modifier l'image du service",
                 'validation' => null,
                 'post' => $post
             ];
             if ($this->request->getMethod() == 'post') {
-                $rules = [
-                    'picture' => [
-                        'label' => 'Image',
-                        'rules' => 'uploaded[picture]|is_image[picture]|max_size[picture,5096]',
-                        'errors' => [
-                            'uploaded' => 'Ne doit pas être vide',
-                            'is_image' => 'Le format de cet image est inconnu',
-                            'max_size' => 'Ne doit pas dépasser 5 Mo de taille',
-                        ]
-                    ]
-                ];
+                $rules = $this->serviceModel->getValidationRules(['only' => ['picture']]);
                 if ($this->validate($rules)) {
                     $file = $this->request->getFile('picture');
 
                     if ($file->isValid() && !$file->hasMoved()) {
                         $imageName = $file->getRandomName();
 
-                        $data = ['postImage' => $imageName];
+                        $data = ['picture' => $imageName];
 
                         $this->postModel->update($id, $data);
 
-                        $file->move('./public/assets/img/posts', $imageName);
-                        session()->setFlashData("success", "Mise à jour effectué avec succès !");
-                        return redirect()->to('/list-posts');
+                        $file->move('./public/assets/es_admin/images/services', $imageName);
+                        return redirect()->to('/list-posts')->with("success", "Mise à jour effectué avec succès !");
                     }
                 } else {
                     $data['validation'] = $this->validation->getErrors();
                 }
             }
-            echo view('posts/admin/image', $data);
+            echo view('services/admin/image', $data);
 
         } else {
             return redirect()->back();
@@ -177,14 +129,12 @@ class Services extends BaseController
 
     function delete($id)
     {
-        $post = $this->postModel->where('postId', $id)->first();
+        $service = $this->serviceModel->asObject()->find($id);
 
-        if (!empty($post)) {
+        if (!empty($service)) {
             $data = ['is_deleted' => '1'];
-
             $this->postModel->update($id, $data);
-            session()->setFlashData("success", "Suppression succès");
-            return redirect()->to('/list-posts');
+            return redirect()->to('/list-posts')->with("success", "Suppression succès");
         }
     }
 
@@ -216,9 +166,9 @@ class Services extends BaseController
 
 
     public function serviceList()
-    {
+    {               
         $data = [
-            'title' => "Actualités | " . altData(),
+            'title' => "Services | " . altData(),
             'subtitle' => altData(),
             'services' => $this->serviceModel->asObject()
                 ->where(['is_deleted' => '0'])
