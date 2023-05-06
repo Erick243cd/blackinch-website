@@ -52,6 +52,11 @@ $routes->group('', ['filter' => 'AuthCheck'], function ($routes) {
     $routes->get('/change-pwd', 'Auth::change');
     $routes->get('/logout', 'Auth::logout');
 
+    // Carousels
+    $routes->match(['get','post'],'add-carousel/(:any)','Carousel::uploadImages/$1');
+    $routes->get('service-carousels/(:any)', 'Services::getCarouselsByService/$1');
+    $routes->get('delete-carousel/(:any)','Carousel::delete/$1');
+
     // Coords
     $routes->get('coords', 'Coords::index');
     $routes->get('coords-update', 'Coords::update');

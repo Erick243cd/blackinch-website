@@ -12,7 +12,7 @@ class CarouselModel extends Model
     protected $allowedFields = ['pictures', 'service_id', 'created_at', 'updated_at'];
 
     // Dates
-    protected $useTimestamps = false;
+    protected $useTimestamps = true;
     protected $dateFormat = 'datetime';
     protected $createdField = 'created_at';
     protected $updatedField = 'updated_at';
@@ -26,4 +26,7 @@ class CarouselModel extends Model
         return $this->where(['car_id' => $id])->first();
     }
 
+    public function getCarouselsByService($serv){
+        return $this->where(['service_id' => $serv])->findAll();
+    }
 }

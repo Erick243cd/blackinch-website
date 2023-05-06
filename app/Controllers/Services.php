@@ -92,14 +92,14 @@ class Services extends BaseController
 
     function addImage($id)
     {
-        $post = $this->postModel->asObject()->where('postId', $id)->first();
+        $service = $this->serviceModel->asObject()->find($id);
 
-        if (!empty($post)) {
+        if (!empty($service)) {
 
             $data = [
                 'title' => "Modifier l'image du service",
                 'validation' => null,
-                'post' => $post
+                'service' => $service,
             ];
             if ($this->request->getMethod() == 'post') {
                 $rules = $this->serviceModel->getValidationRules(['only' => ['picture']]);
@@ -199,4 +199,13 @@ class Services extends BaseController
             echo view('pages/services', $data);
         }
     }
+    
+    function getCarouselsByService($id){
+        $data = [
+            'title' => "Les images du service ",
+            'service' => $this->serviceModel->asObject()->find($id),
+            'cars' => $this->carouselModel->asObject()->getCarouselsByService($id),
+        ];
+        return view('services/admin/carousels',$data);         
+     }
 }

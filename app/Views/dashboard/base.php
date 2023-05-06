@@ -39,8 +39,6 @@ $user_data = session()->get('user_data');
             font-family: "Century Gothic";
             background: linear-gradient(blue, white, orangered, black);
         }
-
-        }
     </style>
 </head>
 <!-- [ Pre-loader ] start -->
@@ -281,7 +279,15 @@ $user_data = session()->get('user_data');
 <script src="<?= base_url() ?>/public/assets/es_admin/js/plugins/select2.full.min.js"></script>
 <!-- form-select-custom Js -->
 <script src="<?= base_url() ?>/public/assets/es_admin/js/pages/form-select-custom.js"></script>
+<script src="<?= base_url() ?>/public/assets/es_admin/js/plugins/lightbox.min.js"></script>
+<link rel="stylesheet" href="<?= base_url() ?>public/assets/es_admin/css/plugins/lightbox.min.css">
 
+<script>
+    lightbox.option({
+        'resizeDuration': 200,
+        'wrapAround': true
+    })
+</script>
 <script>
     $('#user-list-table').DataTable();
 </script>
